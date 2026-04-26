@@ -83,6 +83,10 @@ impl From<u64> for Counter<u64> {
 
 impl From<f64> for Counter<f64> {
     fn from(value: f64) -> Self {
+        debug_assert!(
+            value >= 0.0,
+            "Counter::from called with negative value: {value}"
+        );
         Counter(value)
     }
 }
@@ -629,6 +633,13 @@ mod tests {
         let mut counter = ObserveCounter::new(0u64);
         counter.observe(123);
         assert_eq!(counter.get(), 123);
+    }
+
+    #[cfg(debug_assertions)]
+    #[test]
+    #[should_panic(expected = "Counter::from called with negative value")]
+    fn test_counter_f64_from_rejects_negative() {
+        let _counter = Counter::<f64>::from(-1.0);
     }
 
     #[test]
